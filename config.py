@@ -193,7 +193,8 @@ DEFAULTS = {
             'layout_launcher'  : '<Alt>l',
             'next_profile'     : '',
             'previous_profile' : '', 
-            'help'             : 'F1'
+            'help'             : '',
+            'scrollback_to_pager' : 'F1'
         },
         'profiles': {
             'default':  {
@@ -228,6 +229,11 @@ DEFAULTS = {
 #3465a4:#75507b:#06989a:#d3d7cf:#555753:#ef2929:#8ae234:#fce94f:\
 #729fcf:#ad7fa8:#34e2e2:#eeeeec',
                 'word_chars'            : '-,./?%&#:_',
+                # We perform interpolation on this command:
+                # open readonly, I guess. Use ':saveas' to persist and continue editing
+                # noplugin saves 1 sec or so before vim is responsive
+                # leading space to keep out of history
+                'scrollback_pager_cmd'  : ' gvim --noplugin -R +S2P_LINE_NUM S2P_FILE',
                 'mouse_autohide'        : True,
                 'login_shell'           : False,
                 'use_custom_command'    : False,

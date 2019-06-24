@@ -164,7 +164,8 @@ class PrefsEditor:
                         'layout_launcher'  : _('Open layout launcher window'),
                         'next_profile'     : _('Switch to next profile'),
                         'previous_profile' : _('Switch to previous profile'), 
-                        'help'             : _('Open the manual')
+                        'help'             : _('Open the manual'),
+                        'scrollback_to_pager' : _('Open contents of scrollback in pager')
             }
 
     def __init__ (self, term):

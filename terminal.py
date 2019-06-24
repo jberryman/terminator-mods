@@ -1913,6 +1913,43 @@ class Terminal(Gtk.VBox):
         if manual_index_page:
             self.open_url(manual_index_page)
 
+    def key_scrollback_to_pager(self):
+        vscroll = self.vte.get_vadjustment()
+        # print(vscroll.get_value(), vscroll.get_page_size(), vscroll.get_upper(), vscroll.get_lower())
+        line_num = str(int(vscroll.get_value()))
+
+        # Ram-backed FS for faster IPC (maybe):
+        log_folder = '/dev/shm/terminator'
+        log_file = log_folder + '/scrollback_snapshot_log'
+
+        if not os.path.exists(log_folder):
+            os.mkdir(log_folder)
+        
+        # Interpolation on configurable command string
+        cmd = self.config['scrollback_pager_cmd'].replace('S2P_LINE_NUM', line_num).replace('S2P_FILE', log_file) + '\n'
+
+        fd = open(log_file, 'w+')
+        col, row = self.vte.get_cursor_position()
+
+        ## NOTE: Amazingly this is much slower than using the clipboard hack below.
+        ##       VTE should support this better in API
+        # content = self.vte.get_text_range(0, 0, row, col)
+        # fd.write(content[0])
+        # fd.close()
+
+        # Get all scrollback into clipboard, else just selected text. Depends on 'xclip' which probably isn't installed.
+        if not self.vte.get_has_selection():
+            self.vte.select_all()
+            self.vte.unselect_all()
+        subprocess.Popen(["xclip", "-o"], stdout=fd)
+        # clear those 1000s of lines from clipboard:
+        os.system('echo -n '' | xclip -i')
+
+        # The command string is actually typed into the terminal (which was not
+        # my first idea, but I actually like it now):
+        self.vte.feed_child(cmd, len(cmd))
+
+
 # End key events
 
 GObject.type_register(Terminal)
